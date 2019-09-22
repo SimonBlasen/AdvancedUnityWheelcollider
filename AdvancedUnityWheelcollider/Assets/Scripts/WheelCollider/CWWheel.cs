@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CWWheel : MonoBehaviour
+public class CWWheel
 {
     public const float gAcc = 9.81f;
     public float EPSILON = 0.001f;
@@ -117,20 +117,55 @@ public class CWWheel : MonoBehaviour
 
     private Transform wheelSphere;
     private Rigidbody rb;
-    private CWWheelTorqueDistr torqueDistr;
+    public CWWheelTorqueDistr torqueDistr;
 
     //public Transform wheelVelocityDebug;
 
 
+    private Transform transform;
+    private WheelColliderAdv wheelColliderAdv;
 
-    void Start()
+    public CWWheel(WheelColliderAdv _wheelColliderAdv, Transform _transform, Rigidbody rigidbody, CWPacejka pacejkaParam,
+        Transform wheelMeshParam, float _restLength, float _springTravel, float _springStiffness, float _springDamping, float _wheelRadius, float _wheelMass)
     {
-        if (pacejka == null)
-        {
-            pacejka = GameObject.FindObjectOfType<CWPacejka>();
-        }
-        rb = GetComponentInParent<Rigidbody>();
-        torqueDistr = GetComponent<CWWheelTorqueDistr>();
+        wheelColliderAdv = _wheelColliderAdv;
+        transform = _transform;
+        wheelMesh = wheelMeshParam;
+        rb = rigidbody;
+        pacejka = pacejkaParam;
+
+        restLength = _restLength;
+        springTravel = _springTravel;
+        springStiffness = _springStiffness;
+        springDamping = _springDamping;
+        wheelRadius = _wheelRadius;
+        wheelMass = _wheelMass;
+
+        maxWheelVelocity = 20f;
+        maxWheelVelocityAcc = 10f;
+        antiRollStiffness = 0f;
+        applyForceGround = true;
+        smoothStep = true;
+
+        slowCorrectionStart = 0.11f;
+        slowCorrectionForce = 0.1f;
+
+        wheelSphereJumpThreshold = 0.05f;
+        wheelSphereJumpMaxAngle = 30f;
+        wheelSphereJumpMinAngleNormals = 5f;
+        wheelSphereJumpMinGroundTime = 0f;
+        wheelSphereJumpNormalDistanceMin = 0.05f;
+        wheelMaxForce = 10000000f;
+        wheelMaxA = 10f;
+
+        angularVelocity = 0f;
+        fcSide = 1f;
+
+
+
+
+
+        //Start
 
         minLength = restLength - springTravel;
         maxLength = restLength + springTravel;
@@ -162,15 +197,19 @@ public class CWWheel : MonoBehaviour
         }
     }
 
-    private void Update()
+
+    public void Update()
     {
         wheelAngle = Mathf.Lerp(wheelAngle, SteerAngle, Time.deltaTime * 10f);
         transform.localRotation = Quaternion.Euler(transform.localRotation.x, wheelAngle, transform.localRotation.z);
 
         Debug.DrawRay(transform.position, -transform.up * (springLength + wheelRadius), Color.green);
 
-        wheelMesh.localPosition = new Vector3(0f, -springLength, 0f);
-        wheelMesh.Rotate(Vector3.right, angularVelocity * Time.deltaTime * wheelTurnFac, Space.Self);
+        if (wheelMesh != null)
+        {
+            wheelMesh.localPosition = new Vector3(0f, -springLength, 0f);
+            wheelMesh.Rotate(Vector3.right, angularVelocity * Time.deltaTime * wheelTurnFac, Space.Self);
+        }
 
         if (debugMessages)
         {
@@ -201,10 +240,10 @@ public class CWWheel : MonoBehaviour
 
     private bool wentInOnce = false;
     public float fcSide = 1f;
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         //angularVelocity += Input.GetAxis("Vertical");
-        //if (debugMessages) GraphManager.Graph.Plot("Longitude", angularVelocity, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 100f)));
+        if (debugMessages) GraphManager.Graph.Plot("Longitude", angularVelocity, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 100f)));
 
         
 

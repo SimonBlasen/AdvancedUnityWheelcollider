@@ -2,22 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CWWheelTorqueDistr : MonoBehaviour
+public class CWWheelTorqueDistr
 {
     [SerializeField]
     private CWPacejka pacejka;
     [SerializeField]
-    private bool ABS;
-    [SerializeField]
     private float ABS_minAngVel = 13f;
     [SerializeField]
-    private bool TC;
-    [SerializeField]
-    private float TC_minAngVel = 1f;
+    private float TC_minAngVel = 13f;
     [SerializeField]
     private float TC_minVel = 1f;
 
-    private CWWheel wheel;
+    public CWWheel wheel;
     private Rigidbody rb;
 
     public bool debugMessages = false;
@@ -39,26 +35,27 @@ public class CWWheelTorqueDistr : MonoBehaviour
     public bool hasMotor = false;
     private float lastAcc = 0f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        if (pacejka == null)
-        {
-            pacejka = GameObject.FindObjectOfType<CWPacejka>();
-        }
-        wheel = GetComponent<CWWheel>();
-        rb = GetComponentInParent<Rigidbody>();
+    private WheelColliderAdv wheelColliderAdv;
 
+    public CWWheelTorqueDistr(WheelColliderAdv _wheelColliderAdv, CWWheel _wheel, Rigidbody rigidbody, CWPacejka cWPacejka, bool _hasMotor)
+    {
+        wheelColliderAdv = _wheelColliderAdv;
+        wheel = _wheel;
+        rb = rigidbody;
+        pacejka = cWPacejka;
+        hasMotor = _hasMotor;
+
+        //Start
         wheelMass = wheel.WheelMass;
         wheelRadius = wheel.Radius;
         J = wheelMass * wheelRadius * wheelRadius * 0.5f;
     }
 
-    public float angVelThreshStop = 0.1f;
-    public float slipForwThreshStop = 0.1f;
-    public float slowdownFac = 0.01f;
-    public float slowdownFacDamper = 100f;
-    private void FixedUpdate()
+    private float angVelThreshStop = 0.6f;
+    private float slipForwThreshStop = 1f;
+    private float slowdownFac = 4000f;
+    private float slowdownFacDamper = -1000f;
+    public void FixedUpdate()
     {
         float currentSlip = wheel.PacejkaSlipLong * 100f;
         //if (debugMessages) GraphManager.Graph.Plot("Longitude", currentSlip, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
@@ -110,7 +107,7 @@ public class CWWheelTorqueDistr : MonoBehaviour
             //if (debugMessages) GraphManager.Graph.Plot("Longitude2", currentBrake, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
 
 
-            if (ABS == false || currentSlip >= 0f || wheel.AngularVelocity <= ABS_minAngVel || (currentSlip < 0f && currentSlip > optimalBackwardSlip))
+            if (wheelColliderAdv.AntiBlockSystem == false || currentSlip >= 0f || wheel.AngularVelocity <= ABS_minAngVel || (currentSlip < 0f && currentSlip > optimalBackwardSlip))
             {
                 if (Mathf.Abs(wheel.AngularVelocity) >= Mathf.Abs(thetaDelta))
                 {
@@ -124,6 +121,7 @@ public class CWWheelTorqueDistr : MonoBehaviour
             }
             else
             {
+                if (debugMessages) Debug.Log("No power due to braking");
                 calculateNoPower();
             }
 
@@ -142,21 +140,28 @@ public class CWWheelTorqueDistr : MonoBehaviour
 
                     thetaDelta = Mathf.Sqrt(2f * (W / J));
 
-                    if (TC == false || wheel.AngularVelocity < TC_minAngVel || rb.velocity.magnitude < TC_minVel || (currentSlip > 0f && currentSlip < optimalForwardSlip))
+                    if (wheelColliderAdv.TractionControl == false || wheel.AngularVelocity < TC_minAngVel || rb.velocity.magnitude < TC_minVel || (currentSlip > 0f && currentSlip < optimalForwardSlip))
                     {
                         wheel.AngularVelocity += thetaDelta * Mathf.Sign(currentPower);
+                        if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
                     }
                     else
                     {
                         calculateNoPower();
+                        if (debugMessages) Debug.Log("No power due to TC");
                     }
                 }
                 else if (currentPower == 0f)
                 {
+                    if (debugMessages) Debug.Log("Power is zero");
                     calculateNoPower();
 
 
                 }
+            }
+            else
+            {
+                if (debugMessages) Debug.Log("Nan");
             }
         }
 
@@ -239,7 +244,7 @@ public class CWWheelTorqueDistr : MonoBehaviour
             wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
             //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
 
-            if (debugMessages) Debug.Log("No power");
+            //if (debugMessages) Debug.Log("No power");
 
             lastAcc = wheelAcc;
                 //}
@@ -265,13 +270,13 @@ public class CWWheelTorqueDistr : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         if (hasMotor)
         {
             if (Input.GetKey(KeyCode.UpArrow))
             {
-                ApplyPower(0.05f * 3f * 0.05f);
+                ApplyPower(0.05f * 3f);
             }
             else
             {

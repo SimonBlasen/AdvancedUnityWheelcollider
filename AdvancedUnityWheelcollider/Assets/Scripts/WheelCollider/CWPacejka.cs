@@ -6,15 +6,15 @@ public class CWPacejka : MonoBehaviour
 {
     //const float D3_EPSILON = 0.00001f;
 
-    public float cFz;
-    public float camberAngle;
-    public float sampleStep = 0.1f;
+    public float cFz = 1.6f;
+    public float camberAngle = 0f;
+    public float sampleStep = 0.5f;
 
-    public float autoY = 20f;
-    public float autoB2 = 0.01f;
+    public float autoY = 1f;
+    public float autoB2 = 1f;
 
-    public float a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a112, a12, a13, a14, a15, a16, a17 = 0f;
-    public float b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13 = 0f;
+    public float a0 = 1.5f, a1 = -22f, a2 = 1011f, a3 = 1078f, a4 = 1.82f, a5 = 0.208f, a6 = 0f, a7 = -0.3f, a8, a9, a10, a11, a112, a12, a13, a14, a15, a16, a17 = 0.5f;
+    public float b0 = 1.65f, b1 = -21f, b2 = 1144f, b3 = 49f, b4 = 226f, b5 = -0.1f, b6, b7 = 0.1f, b8 = -5f, b9, b10, b11, b12, b13 = 0f;
     public float c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17 = 0f;
 
     float camber = 0f;

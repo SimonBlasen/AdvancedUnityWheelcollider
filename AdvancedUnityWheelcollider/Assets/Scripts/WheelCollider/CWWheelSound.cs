@@ -22,7 +22,7 @@ public class CWWheelSound : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        wheel = GetComponent<CWWheel>();
+        wheel = GetComponent<WheelColliderAdv>().CWWheel;
         audioSource.clip = audioTireSqueal;
         audioSource.loop = true;
         audioSource.Play();

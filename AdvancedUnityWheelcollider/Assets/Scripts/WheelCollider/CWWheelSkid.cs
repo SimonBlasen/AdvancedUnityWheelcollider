@@ -33,7 +33,7 @@ public class CWWheelSkid : MonoBehaviour
             Debug.LogError("No Skidmarks found in scene");
         }
 
-        wheel = GetComponent<CWWheel>();
+        wheel = GetComponent<WheelColliderAdv>().CWWheel;
     }
 
     // Update is called once per frame

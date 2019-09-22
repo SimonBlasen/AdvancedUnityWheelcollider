@@ -8,7 +8,7 @@ public class CWCarController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField]
-    private CWWheel[] frontWheels;
+    private WheelColliderAdv[] frontWheels;
     [SerializeField]
     private Transform com;
     [SerializeField]
