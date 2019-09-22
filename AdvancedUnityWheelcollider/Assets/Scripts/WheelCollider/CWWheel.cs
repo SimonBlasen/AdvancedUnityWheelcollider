@@ -60,6 +60,8 @@ public class CWWheel : MonoBehaviour
     private float wheelSphereJumpNormalDistanceMin = 0.3f;
     [SerializeField]
     private float wheelMaxForce = 10f;
+    [SerializeField]
+    private float wheelMaxA = 10f;
 
     public bool debugMessages = false;
 
@@ -354,7 +356,7 @@ public class CWWheel : MonoBehaviour
 
                 camberAngle = 0f;
 
-                if (debugMessages) GraphManager.Graph.Plot("Longitude", Mathf.Abs(slipAngle), Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude", Mathf.Abs(slipLongitudinal), Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
                 if (true || rb.velocity.magnitude > 0f)
                 {
                     fx = pacejka.CalcLongitudinalF(verticalTireLoad, slipLongitudinal * 100f);
@@ -370,13 +372,35 @@ public class CWWheel : MonoBehaviour
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude242dd", wheelVelocity.x, Color.green, new Rect(new Vector2(10f, 60f + 110f * 2f), new Vector2(1000f, 100f)));
 
 
+                // F = m * a
+
+                float shiftedMass = suspensionForceRay / gAcc;
+                //if (debugMessages) Debug.Log("ShiftedMass: " + shiftedMass);
+                float curAX = fx / (shiftedMass);
+                float curAY = fy / (shiftedMass);
+
+                float curA = Mathf.Sqrt(curAX * curAX + curAY * curAY);
+
+
+
+
+                if (debugMessages) GraphManager.Graph.Plot("Longitude", curA, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+
+                if (curA > wheelMaxA)
+                {
+                    float reductPercentage = wheelMaxA / curA;
+                    fx *= reductPercentage;
+                    fy *= reductPercentage;
+                }
+
+
 
 
                 //Debug.Log("Fz: " + verticalTireLoad);
 
                 // Clamping for max force of tire
 
-                if (Mathf.Abs(fx) + Mathf.Abs(fy) > wheelMaxForce)
+                /*if (Mathf.Abs(fx) + Mathf.Abs(fy) > wheelMaxForce)
                 {
                     float signFx = Mathf.Sign(fx);
                     float forceCurrent = Mathf.Abs(fx) + Mathf.Abs(fy);
@@ -387,7 +411,7 @@ public class CWWheel : MonoBehaviour
                     }
                     fx = fx * signFx;
                     //fy = fy * (wheelMaxForce / forceCurrent);
-                }
+                }*/
 
                 //fx = ((new Vector2(fx, fy)).normalized * wheelMaxForce).x;
                 //fy = ((new Vector2(fx, fy)).normalized * wheelMaxForce).y;
@@ -415,6 +439,8 @@ public class CWWheel : MonoBehaviour
                         force.z = 0f;
                     }
                     rb.AddForceAtPosition(force, hit.point + (applyForceGround ? 0f : 1f) * transform.up * wheelRadius);
+                    Debug.DrawRay(transform.position + Vector3.up * 1f, fx * transform.forward / 4000f, Color.green);
+                    Debug.DrawRay(transform.position + Vector3.up * 1f, fy * -transform.right / 4000f, new Color(0.5f, 0.5f, 1f));
                 }
                 wentInOnce = true;
 
@@ -567,6 +593,14 @@ public class CWWheel : MonoBehaviour
         }
     }
 
+    public float LongitudinalHubVelocity
+    {
+        get
+        {
+            return wheelHubVelocityLongitudinal;
+        }
+    }
+
     public float Radius
     {
         get
@@ -590,7 +624,7 @@ public class CWWheel : MonoBehaviour
         {
             if (debugMessages)
             {
-                Debug.Log("was " + angularVelocity.ToString() + " is " + value.ToString());
+                //Debug.Log("was " + angularVelocity.ToString() + " is " + value.ToString());
             }
             angularVelocity = value;
         }

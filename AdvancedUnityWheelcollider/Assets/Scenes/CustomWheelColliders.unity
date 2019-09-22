@@ -5702,6 +5702,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -5874,6 +5876,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 10000
+  slowdownFacDamper: 0.01
 --- !u!4 &239222176
 Transform:
   m_ObjectHideFlags: 0
@@ -7580,6 +7583,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -7752,6 +7757,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 10000
+  slowdownFacDamper: 0.01
 --- !u!1 &403837012
 GameObject:
   m_ObjectHideFlags: 0
@@ -11952,6 +11958,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: -1000
 --- !u!114 &632431153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12004,6 +12011,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 1000000
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -13188,7 +13197,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 703326434}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.44, y: 6.427, z: 0}
+  m_LocalPosition: {x: 14.32, y: 0.54, z: -0.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 804203681}
@@ -19123,6 +19132,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -19280,6 +19291,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: 0.01
 --- !u!1 &1037397663
 GameObject:
   m_ObjectHideFlags: 0
@@ -21820,6 +21832,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 1
   angularVelocity: 0
   fcSide: 1
@@ -21992,6 +22006,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 10000
+  slowdownFacDamper: 0.01
 --- !u!1 &1217711268
 GameObject:
   m_ObjectHideFlags: 0
@@ -24580,6 +24595,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 1000000
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -24734,6 +24751,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: -1000
 --- !u!114 &1362311673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26119,6 +26137,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -26276,6 +26296,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: 0.01
 --- !u!1 &1447167481
 GameObject:
   m_ObjectHideFlags: 0
@@ -30536,6 +30557,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -30562,6 +30585,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 10000
+  slowdownFacDamper: 0.01
 --- !u!1 &1696525889
 GameObject:
   m_ObjectHideFlags: 0
@@ -30632,6 +30656,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -30789,6 +30815,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: 0.01
 --- !u!1001 &1702750574
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34205,7 +34232,9 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
-  debugMessages: 0
+  wheelMaxForce: 1000000
+  wheelMaxA: 10
+  debugMessages: 1
   angularVelocity: 0
   fcSide: 1
 --- !u!114 &1859287714
@@ -34344,6 +34373,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: -1000
 --- !u!114 &1859287717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34432,6 +34462,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 1000000
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -34586,6 +34618,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: -1000
 --- !u!114 &1861830251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37913,6 +37946,8 @@ MonoBehaviour:
   wheelSphereJumpMinAngleNormals: 5
   wheelSphereJumpMinGroundTime: 0
   wheelSphereJumpNormalDistanceMin: 0.05
+  wheelMaxForce: 10
+  wheelMaxA: 10
   debugMessages: 0
   angularVelocity: 0
   fcSide: 1
@@ -38070,6 +38105,7 @@ MonoBehaviour:
   angVelThreshStop: 0.6
   slipForwThreshStop: 1
   slowdownFac: 4000
+  slowdownFacDamper: 0.01
 --- !u!1001 &2027990043
 PrefabInstance:
   m_ObjectHideFlags: 0

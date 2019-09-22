@@ -57,6 +57,7 @@ public class CWWheelTorqueDistr : MonoBehaviour
     public float angVelThreshStop = 0.1f;
     public float slipForwThreshStop = 0.1f;
     public float slowdownFac = 0.01f;
+    public float slowdownFacDamper = 100f;
     private void FixedUpdate()
     {
         float currentSlip = wheel.PacejkaSlipLong * 100f;
@@ -164,6 +165,8 @@ public class CWWheelTorqueDistr : MonoBehaviour
 
     }
 
+    private float oldWheelHubVel = 0f;
+
     private void calculateNoPower()
     {
         //if (debugMessages) GraphManager.Graph.Plot("Longitude", Mathf.Abs(slipLong), Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
@@ -188,23 +191,54 @@ public class CWWheelTorqueDistr : MonoBehaviour
             //if (float.IsNaN(fWheel) == false)
             //{
             //if (debugMessages) Debug.Log("slip: " + wheel.SlipForward * Mathf.Sign(wheel.PacejkaSlipLong));
-            float pOut = (0f - slipDiff) * slowdownFac;
 
-                /*if (float.IsNaN(pOut) || float.IsInfinity(pOut) || float.IsNegativeInfinity(pOut)
-                    || Mathf.Abs(pOut) > 3000f)
+
+
+
+            float slowdownSlowdoanFac = 1f;
+            if (wheel.LongitudinalHubVelocity < 7f)
+            {
+                slowdownSlowdoanFac = 7f - wheel.LongitudinalHubVelocity;
+            }
+            float manipulatedSlowdown = slowdownFac * slowdownSlowdoanFac;
+            if (manipulatedSlowdown < 400f)
+            {
+                manipulatedSlowdown = 400f;
+            }
+
+
+
+
+            manipulatedSlowdown = slowdownFac;
+            float pOut = (0f - slipDiff) * manipulatedSlowdown;
+
+            float wheelAngDamper = (oldWheelHubVel - wheel.AngularVelocity) * slowdownFacDamper;
+
+
+
+            pOut += wheelAngDamper;
+
+
+            /*if (float.IsNaN(pOut) || float.IsInfinity(pOut) || float.IsNegativeInfinity(pOut)
+                || Mathf.Abs(pOut) > 3000f)
+            {
+                Debug.LogError("Cor");
+                wheel.AngularVelocity += lastAcc * Time.fixedDeltaTime;
+                if (float.IsNaN(pOut) == false && float.IsInfinity(pOut) == false && float.IsNegativeInfinity(pOut) == false)
                 {
-                    Debug.LogError("Cor");
-                    wheel.AngularVelocity += lastAcc * Time.fixedDeltaTime;
-                    if (float.IsNaN(pOut) == false && float.IsInfinity(pOut) == false && float.IsNegativeInfinity(pOut) == false)
-                    {
-                        lastAcc = Mathf.Clamp(pOut, -3000f, 3000f);
-                    }
+                    lastAcc = Mathf.Clamp(pOut, -3000f, 3000f);
                 }
-                else
-                {*/
-                    float wheelAcc = (pOut) / wheelMass;
+            }
+            else
+            {*/
 
-                    wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
+
+            float wheelAcc = (pOut) / wheelMass;
+
+            oldWheelHubVel = wheel.AngularVelocity;
+            wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
+            //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+
             if (debugMessages) Debug.Log("No power");
 
             lastAcc = wheelAcc;
@@ -237,7 +271,7 @@ public class CWWheelTorqueDistr : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.UpArrow))
             {
-                ApplyPower(0.05f * 3f);
+                ApplyPower(0.05f * 3f * 0.05f);
             }
             else
             {
