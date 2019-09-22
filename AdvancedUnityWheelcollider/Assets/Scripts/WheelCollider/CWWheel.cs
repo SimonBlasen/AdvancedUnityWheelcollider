@@ -318,7 +318,19 @@ public class CWWheel
                 // Forces calculation
 
 
+
                 wheelHubVelocityLongitudinal = wheelVelocity.z;
+
+                float cutBorder = 0.02f;
+                float minVal = 0.001f;
+                if (Mathf.Abs(wheelHubVelocityLongitudinal) < cutBorder)
+                {
+                    float gB = minVal;
+                    float gA = (cutBorder - gB) / cutBorder;
+                    wheelHubVelocityLongitudinal = gA * wheelHubVelocityLongitudinal + gB;
+                }
+
+
                 tireTreadLongitudinalVelocity = angularVelocity * wheelRadius;
                 slipVelocityLongitudinal = tireTreadLongitudinalVelocity - wheelHubVelocityLongitudinal;
                 slipLongitudinalRaw = slipVelocityLongitudinal;
