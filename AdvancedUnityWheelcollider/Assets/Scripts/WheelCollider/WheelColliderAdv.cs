@@ -105,7 +105,7 @@ public class WheelColliderAdv : MonoBehaviour
         cwWheelTorqueDistr = new CWWheelTorqueDistr(this, cwWheel, carRigidbody, customPacejka, hasMotor);
         cwWheel.torqueDistr = cwWheelTorqueDistr;
 
-        cwWheelTorqueDistr.debugMessages = debugMessages;
+        cwWheel.debugMessages = debugMessages;
 
     }
 

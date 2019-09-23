@@ -49,6 +49,9 @@ public class CWWheelTorqueDistr
         wheelMass = wheel.WheelMass;
         wheelRadius = wheel.Radius;
         J = wheelMass * wheelRadius * wheelRadius * 0.5f;
+
+        slowdownFac *= (wheelMass / 15f);
+        slowdownFacDamper *= (wheelMass / 15f);
     }
 
     private float angVelThreshStop = 0.6f;
@@ -143,7 +146,7 @@ public class CWWheelTorqueDistr
                     if (wheelColliderAdv.TractionControl == false || wheel.AngularVelocity < TC_minAngVel || rb.velocity.magnitude < TC_minVel || (currentSlip > 0f && currentSlip < optimalForwardSlip))
                     {
                         wheel.AngularVelocity += thetaDelta * Mathf.Sign(currentPower);
-                        if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
+                        if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
                     }
                     else
                     {
@@ -153,7 +156,7 @@ public class CWWheelTorqueDistr
                 }
                 else if (currentPower == 0f)
                 {
-                    if (debugMessages) Debug.Log("Power is zero");
+                    //if (debugMessages) Debug.Log("Power is zero");
                     calculateNoPower();
 
 
@@ -242,6 +245,7 @@ public class CWWheelTorqueDistr
 
             oldWheelHubVel = wheel.AngularVelocity;
             wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
+            if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
             //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
 
             //if (debugMessages) Debug.Log("No power");

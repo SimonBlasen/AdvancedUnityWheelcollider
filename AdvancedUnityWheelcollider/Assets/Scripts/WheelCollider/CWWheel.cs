@@ -243,7 +243,7 @@ public class CWWheel
     public void FixedUpdate()
     {
         //angularVelocity += Input.GetAxis("Vertical");
-        if (debugMessages) GraphManager.Graph.Plot("Longitude", angularVelocity, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 100f)));
+        //if (debugMessages) GraphManager.Graph.Plot("Longitude", angularVelocity, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 100f)));
 
         
 
@@ -321,15 +321,15 @@ public class CWWheel
 
                 wheelHubVelocityLongitudinal = wheelVelocity.z;
 
-                float cutBorder = 0.02f;
-                float minVal = 0.001f;
+                float cutBorder = 0.1f;
+                float minVal = 0.01f;
                 if (Mathf.Abs(wheelHubVelocityLongitudinal) < cutBorder)
                 {
                     float gB = minVal;
                     float gA = (cutBorder - gB) / cutBorder;
-                    wheelHubVelocityLongitudinal = gA * wheelHubVelocityLongitudinal + gB;
+                    wheelHubVelocityLongitudinal = gA * wheelHubVelocityLongitudinal + gB * Mathf.Sign(wheelHubVelocityLongitudinal);
                 }
-
+                
 
                 tireTreadLongitudinalVelocity = angularVelocity * wheelRadius;
                 slipVelocityLongitudinal = tireTreadLongitudinalVelocity - wheelHubVelocityLongitudinal;
@@ -351,6 +351,7 @@ public class CWWheel
                     slipLongitudinalRaw = slipVelocityLongitudinal;
                     slipLongitudinal = slipVelocityLongitudinal / Mathf.Abs(wheelHubVelocityLongitudinal);
                 }
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude11", Mathf.Abs(angularVelocity), Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
 
 
                 /*Vector2 wheelVelocity2D = new Vector2(wheelVelocity.x, wheelVelocity.z);
@@ -380,10 +381,11 @@ public class CWWheel
 
                 if (wheelVelocity2D.y < slowCorrectionStart)
                 {
-                    //Debug.Log("Corrected");
+                    Debug.Log("Corrected");
                     float correctionImpact = (slowCorrectionStart - wheelVelocity2D.y) / (slowCorrectionStart - slowCorrectionForce);
 
                     float corrected = Mathf.Clamp(wheelVelocity2D.x, -3f, 3f);
+
 
                     if (float.IsNaN(slipVelocityLongitudinal))
                     {
@@ -419,7 +421,7 @@ public class CWWheel
 
 
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude2", slipLongitudinal, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
-                //if (debugMessages) GraphManager.Graph.Plot("Longitude242", slipAngle, Color.green, new Rect(new Vector2(10f, 60f + 110f), new Vector2(1000f, 100f)));
+                if (debugMessages) GraphManager.Graph.Plot("Longitude242", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude242dd", wheelVelocity.x, Color.green, new Rect(new Vector2(10f, 60f + 110f * 2f), new Vector2(1000f, 100f)));
 
 
@@ -435,7 +437,7 @@ public class CWWheel
 
 
 
-                if (debugMessages) GraphManager.Graph.Plot("Longitude", curA, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude", curA, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
 
                 if (curA > wheelMaxA)
                 {

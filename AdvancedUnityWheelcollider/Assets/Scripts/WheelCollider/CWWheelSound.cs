@@ -16,13 +16,13 @@ public class CWWheelSound : MonoBehaviour
     private float slipFactor = 1f;
 
     private AudioSource audioSource;
-    private CWWheel wheel;
+    private WheelColliderAdv wheel;
 
     // Start is called before the first frame update
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        wheel = GetComponent<WheelColliderAdv>().CWWheel;
+        wheel = GetComponent<WheelColliderAdv>();
         audioSource.clip = audioTireSqueal;
         audioSource.loop = true;
         audioSource.Play();
@@ -31,9 +31,9 @@ public class CWWheelSound : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (wheel.IsGrounded)
+        if (wheel.CWWheel.IsGrounded)
         {
-            float slipSum = wheel.SlipForward * forwardSlipFactor + wheel.SlipSidewards * sideSlipFactor;
+            float slipSum = wheel.CWWheel.SlipForward * forwardSlipFactor + wheel.CWWheel.SlipSidewards * sideSlipFactor;
 
             if (slipSum > slipThreshold)
             {
