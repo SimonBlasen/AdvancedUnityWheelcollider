@@ -5591,12 +5591,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af73e1863c154f140857dd2ec8e97e75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1029269980}
+  target: {fileID: 703326437}
   distance: 10
   height: 4
   heightDamping: 2
   lookAtHeight: 0
-  parentRigidbody: {fileID: 1029269981}
+  parentRigidbody: {fileID: 703326436}
   rotationSnapTime: 0.3
   distanceSnapTime: 0
   distanceMultiplier: 0
@@ -11135,7 +11135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &703326435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14102,7 +14102,7 @@ MonoBehaviour:
   ABS: 0
   TC: 0
   hasMotor: 0
-  debugMessages: 0
+  debugMessages: 1
 --- !u!4 &897570706
 Transform:
   m_ObjectHideFlags: 0
@@ -16637,7 +16637,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1029269980
 Transform:
   m_ObjectHideFlags: 0

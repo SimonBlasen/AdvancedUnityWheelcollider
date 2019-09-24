@@ -33,7 +33,7 @@ public class CWWheel
     [SerializeField]
     private bool applyForceGround = true;
     [SerializeField]
-    private bool smoothStep = false;
+    private bool smoothStep = true;
 
     [Space]
 
@@ -124,6 +124,11 @@ public class CWWheel
 
     private Transform transform;
     private WheelColliderAdv wheelColliderAdv;
+
+    private float fLateralDamper = 0.1f;
+    private float fLongitudinalDamper = 0f;//200f;
+    private float oldFY = 0f;
+    private float oldFX = 0f;
 
     public CWWheel(WheelColliderAdv _wheelColliderAdv, Transform _transform, Rigidbody rigidbody, CWPacejka pacejkaParam,
         Transform wheelMeshParam, float _restLength, float _springTravel, float _springStiffness, float _springDamping, float _wheelRadius, float _wheelMass)
@@ -307,7 +312,10 @@ public class CWWheel
 
 
                 //if (debugMessages) Debug.Log("Force calc");
-                wheelVelocity = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point) - groundVelocity);
+                Vector3 newWheelVelocity = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point) - groundVelocity);
+
+                wheelVelocity = 0.1f * newWheelVelocity + 0.9f * wheelVelocity;
+
                 //fx = Input.GetAxis("Vertical") * springForceRay;
                 //fy = wheelVelocity.x * springForceRay;
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheelVelocity.z, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 100f)));
@@ -351,7 +359,8 @@ public class CWWheel
                     slipLongitudinalRaw = slipVelocityLongitudinal;
                     slipLongitudinal = slipVelocityLongitudinal / Mathf.Abs(wheelHubVelocityLongitudinal);
                 }
-                //if (debugMessages) GraphManager.Graph.Plot("Longitude11", Mathf.Abs(angularVelocity), Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude11", wheelVelocity.x, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
+                if (debugMessages) GraphManager.Graph.Plot("Longitude112", wheelVelocity.z, Color.green, new Rect(new Vector2(10f, 60f + 210f), new Vector2(1000f, 200f)));
 
 
                 /*Vector2 wheelVelocity2D = new Vector2(wheelVelocity.x, wheelVelocity.z);
@@ -368,7 +377,17 @@ public class CWWheel
 
 
                 // TODO approximate slipAngle at low velocities
-                slipAngle = Mathf.Atan(wheelVelocity.x / wheelVelocity.z * Mathf.Sign(wheelVelocity.z)) * 180f / Mathf.PI;
+
+                //slipAngle = Mathf.Atan(wheelVelocity.x / wheelVelocity.z * Mathf.Sign(wheelVelocity.z)) * 180f / Mathf.PI;
+
+                slipAngle = Vector2.Angle(new Vector2(wheelVelocity.x, wheelVelocity.z), new Vector2(0f, 1f)) * Mathf.Sign(wheelVelocity.x);
+                if (debugMessages) GraphManager.Graph.Plot("Longitude11", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
+
+
+
+
+
+
                 //slipAngle *= 1f - Mathf.Abs( Mathf.Clamp(slipLongitudinal, -1f, 1f));
 
                 //slipAngle *= (1f / (Mathf.Abs(slipLongitudinal) * 100f + 2f)) + 0.5f;
@@ -409,6 +428,10 @@ public class CWWheel
 
                 camberAngle = 0f;
 
+
+                oldFX = fx;
+                oldFY = fy;
+
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude", Mathf.Abs(slipLongitudinal), Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
                 if (true || rb.velocity.magnitude > 0f)
                 {
@@ -419,9 +442,22 @@ public class CWWheel
                 }
 
 
+                // Damping
+                float diffY = -(fy - oldFY);
+                float diffX = -(fx - oldFX);
+
+                diffY *= fLateralDamper;
+                diffX *= fLongitudinalDamper;
+
+                //fx += diffX;
+                //fy += diffY;
+
+
+
+
 
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude2", slipLongitudinal, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
-                if (debugMessages) GraphManager.Graph.Plot("Longitude242", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude242", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude242dd", wheelVelocity.x, Color.green, new Rect(new Vector2(10f, 60f + 110f * 2f), new Vector2(1000f, 100f)));
 
 
