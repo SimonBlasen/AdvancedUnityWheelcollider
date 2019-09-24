@@ -239,9 +239,13 @@ public class CWWheel
             groundedForTime += Time.deltaTime;
         }
 
+        if (debugMessages) GraphManager.Graph.Plot("Longitudefds", rb.velocity.magnitude, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 400f)));
         //if (debugMessages) GraphManager.Graph.Plot("Longitude", SlipForward, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
         //if (debugMessages) GraphManager.Graph.Plot("Longitudeds", SlipSidewards, Color.green, new Rect(new Vector2(10f, 130f + 260f), new Vector2(1000f, 250f)));
+        tempOldVel = rb.velocity.magnitude;
     }
+
+    private float tempOldVel = 0f;
 
     private bool wentInOnce = false;
     public float fcSide = 1f;
@@ -360,7 +364,9 @@ public class CWWheel
                     slipLongitudinal = slipVelocityLongitudinal / Mathf.Abs(wheelHubVelocityLongitudinal);
                 }
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude11", wheelVelocity.x, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
-                if (debugMessages) GraphManager.Graph.Plot("Longitude112", wheelVelocity.z, Color.green, new Rect(new Vector2(10f, 60f + 210f), new Vector2(1000f, 200f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude112", wheelVelocity.z, Color.green, new Rect(new Vector2(10f, 60f + 210f), new Vector2(1000f, 200f)));
+
+
 
 
                 /*Vector2 wheelVelocity2D = new Vector2(wheelVelocity.x, wheelVelocity.z);
@@ -381,7 +387,7 @@ public class CWWheel
                 //slipAngle = Mathf.Atan(wheelVelocity.x / wheelVelocity.z * Mathf.Sign(wheelVelocity.z)) * 180f / Mathf.PI;
 
                 slipAngle = Vector2.Angle(new Vector2(wheelVelocity.x, wheelVelocity.z), new Vector2(0f, 1f)) * Mathf.Sign(wheelVelocity.x);
-                if (debugMessages) GraphManager.Graph.Plot("Longitude11", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude11", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
 
 
 

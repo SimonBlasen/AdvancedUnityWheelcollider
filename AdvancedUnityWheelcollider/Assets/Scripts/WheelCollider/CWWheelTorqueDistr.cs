@@ -11,7 +11,7 @@ public class CWWheelTorqueDistr
     [SerializeField]
     private float TC_minAngVel = 13f;
     [SerializeField]
-    private float TC_minVel = 1f;
+    private float TC_minVel = 3f;
 
     public CWWheel wheel;
     private Rigidbody rb;
@@ -54,12 +54,20 @@ public class CWWheelTorqueDistr
         slowdownFacDamper *= (wheelMass / 15f);
     }
 
+    private float wheelAccInair = 10f;
+    private float wheelMaxAngularVelocity = 70f;
+
     private float angVelThreshStop = 0.6f;
     private float slipForwThreshStop = 1f;
     private float slowdownFac = 4000f;
     private float slowdownFacDamper = -1000f;
+
+    private float angDiffThreshNoPowerRoll = 0.0f;
+
     public void FixedUpdate()
     {
+        oldWheelHubVel = wheel.AngularVelocity;
+        if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
         float currentSlip = wheel.PacejkaSlipLong * 100f;
         //if (debugMessages) GraphManager.Graph.Plot("Longitude", currentSlip, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
         pacejka_C = pacejka.b0;
@@ -99,33 +107,49 @@ public class CWWheelTorqueDistr
         
         if (currentBrake != 0f)
         {
-            E = 0.5f * J * wheel.angularVelocity * wheel.angularVelocity;
-
-
-            W = Mathf.Abs(currentBrake) * wheelRadius * 1f;
-
-            thetaDelta = Mathf.Sqrt(2f * (W / J));
-
-            //if (debugMessages) Debug.Log("Braking: " + thetaDelta.ToString());
-            //if (debugMessages) GraphManager.Graph.Plot("Longitude2", currentBrake, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
-
-
-            if (wheelColliderAdv.AntiBlockSystem == false || currentSlip >= 0f || wheel.AngularVelocity <= ABS_minAngVel || (currentSlip < 0f && currentSlip > optimalBackwardSlip))
+            if (wheel.IsGrounded)
             {
-                if (Mathf.Abs(wheel.AngularVelocity) >= Mathf.Abs(thetaDelta))
+                E = 0.5f * J * wheel.angularVelocity * wheel.angularVelocity;
+
+
+                W = Mathf.Abs(currentBrake) * wheelRadius * 1f;
+
+                thetaDelta = Mathf.Sqrt(2f * (W / J));
+
+                //if (debugMessages) Debug.Log("Braking: " + thetaDelta.ToString());
+                //if (debugMessages) GraphManager.Graph.Plot("Longitude2", currentBrake, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 100f)));
+
+
+                if (wheelColliderAdv.AntiBlockSystem == false || currentSlip >= 0f || wheel.AngularVelocity <= ABS_minAngVel || (currentSlip < 0f && currentSlip > optimalBackwardSlip))
                 {
-                    wheel.AngularVelocity -= thetaDelta * Mathf.Sign(wheel.AngularVelocity);
-                    if (debugMessages) Debug.Log("Braking: " + wheel.AngularVelocity.ToString());
+                    if (Mathf.Abs(wheel.AngularVelocity) >= Mathf.Abs(thetaDelta))
+                    {
+                        wheel.AngularVelocity -= thetaDelta * Mathf.Sign(wheel.AngularVelocity);
+                        if (debugMessages) Debug.Log("Braking: " + wheel.AngularVelocity.ToString());
+                    }
+                    else
+                    {
+                        wheel.AngularVelocity = 0f;
+                    }
                 }
                 else
                 {
-                    wheel.AngularVelocity = 0f;
+                    if (debugMessages) Debug.Log("No power due to braking");
+                    calculateNoPower();
                 }
             }
             else
             {
-                if (debugMessages) Debug.Log("No power due to braking");
-                calculateNoPower();
+                float newAngVelc = wheel.AngularVelocity - (wheelAccInair / wheel.WheelMass) * Mathf.Sign(wheel.AngularVelocity);
+                if (wheel.AngularVelocity == 0f || Mathf.Sign(newAngVelc) != Mathf.Sign(wheel.AngularVelocity))
+                {
+                    wheel.AngularVelocity = 0f;
+                }
+                else
+                {
+                    wheel.AngularVelocity = newAngVelc;
+                }
+
             }
 
 
@@ -139,19 +163,31 @@ public class CWWheelTorqueDistr
 
                 if (currentPower != 0f)
                 {
-                    W = Mathf.Abs(currentPower) * wheelRadius * 1f;
-
-                    thetaDelta = Mathf.Sqrt(2f * (W / J));
-
-                    if (wheelColliderAdv.TractionControl == false || wheel.AngularVelocity < TC_minAngVel || rb.velocity.magnitude < TC_minVel || (currentSlip > 0f && currentSlip < optimalForwardSlip))
+                    if (wheel.IsGrounded)
                     {
-                        wheel.AngularVelocity += thetaDelta * Mathf.Sign(currentPower);
-                        if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
+                        W = Mathf.Abs(currentPower) * wheelRadius * 1f;
+
+                        thetaDelta = Mathf.Sqrt(2f * (W / J));
+
+                        if (wheelColliderAdv.TractionControl == false || wheel.AngularVelocity < TC_minAngVel || rb.velocity.magnitude < TC_minVel || (currentSlip > 0f && currentSlip < optimalForwardSlip))
+                        {
+                            float matchingAngVelocity = rb.velocity.magnitude / wheel.Radius;
+
+                            //if (wheel.AngularVelocity < matchingAngVelocity * 4f)
+                            //{
+                                wheel.AngularVelocity += thetaDelta * Mathf.Sign(currentPower);
+                            //}
+
+                        }
+                        else
+                        {
+                            calculateNoPower();
+                            if (debugMessages) Debug.Log("No power due to TC");
+                        }
                     }
                     else
                     {
-                        calculateNoPower();
-                        if (debugMessages) Debug.Log("No power due to TC");
+                        wheel.AngularVelocity += (wheelAccInair / wheel.WheelMass) * Mathf.Sign(currentPower);
                     }
                 }
                 else if (currentPower == 0f)
@@ -170,7 +206,14 @@ public class CWWheelTorqueDistr
 
 
         
-
+        if (wheel.AngularVelocity > wheelMaxAngularVelocity)
+        {
+            wheel.AngularVelocity = wheelMaxAngularVelocity;
+        }
+        else if (wheel.AngularVelocity < -wheelMaxAngularVelocity)
+        {
+            wheel.AngularVelocity = -wheelMaxAngularVelocity;
+        }
     }
 
     private float oldWheelHubVel = 0f;
@@ -191,85 +234,102 @@ public class CWWheelTorqueDistr
         }
         else
         {
-            fWheel = pacejka.CalcLongitudinalF(wheel.VerticalTireLoad, wheel.PacejkaSlipLong);
-
-            float slipDiff = wheel.SlipForwardDifference;
-            //if (debugMessages) GraphManager.Graph.Plot("Longitude", slipDiff, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
-
-            //if (float.IsNaN(fWheel) == false)
-            //{
-            //if (debugMessages) Debug.Log("slip: " + wheel.SlipForward * Mathf.Sign(wheel.PacejkaSlipLong));
-
-
-
-
-            float slowdownSlowdoanFac = 1f;
-            if (wheel.LongitudinalHubVelocity < 7f)
+            if (wheel.IsGrounded)
             {
-                slowdownSlowdoanFac = 7f - wheel.LongitudinalHubVelocity;
-            }
-            float manipulatedSlowdown = slowdownFac * slowdownSlowdoanFac;
-            if (manipulatedSlowdown < 400f)
-            {
-                manipulatedSlowdown = 400f;
-            }
+                fWheel = pacejka.CalcLongitudinalF(wheel.VerticalTireLoad, wheel.PacejkaSlipLong);
 
+                float slipDiff = wheel.SlipForwardDifference;
 
-
-
-            manipulatedSlowdown = slowdownFac;
-            float pOut = (0f - slipDiff) * manipulatedSlowdown;
-
-            float wheelAngDamper = (oldWheelHubVel - wheel.AngularVelocity) * slowdownFacDamper;
-
-
-
-            pOut += wheelAngDamper;
-
-
-            /*if (float.IsNaN(pOut) || float.IsInfinity(pOut) || float.IsNegativeInfinity(pOut)
-                || Mathf.Abs(pOut) > 3000f)
-            {
-                Debug.LogError("Cor");
-                wheel.AngularVelocity += lastAcc * Time.fixedDeltaTime;
-                if (float.IsNaN(pOut) == false && float.IsInfinity(pOut) == false && float.IsNegativeInfinity(pOut) == false)
+                if (Mathf.Abs(slipDiff) < angDiffThreshNoPowerRoll)
                 {
-                    lastAcc = Mathf.Clamp(pOut, -3000f, 3000f);
+                    wheel.AngularVelocity -= slipDiff / wheel.Radius;
                 }
+                else
+                {
+
+                    //if (debugMessages) GraphManager.Graph.Plot("Longitude", slipDiff, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+
+                    //if (float.IsNaN(fWheel) == false)
+                    //{
+                    //if (debugMessages) Debug.Log("slip: " + wheel.SlipForward * Mathf.Sign(wheel.PacejkaSlipLong));
+
+
+
+
+                    float slowdownSlowdoanFac = 1f;
+                    if (wheel.LongitudinalHubVelocity < 7f)
+                    {
+                        slowdownSlowdoanFac = 7f - wheel.LongitudinalHubVelocity;
+                    }
+                    float manipulatedSlowdown = slowdownFac * slowdownSlowdoanFac;
+                    if (manipulatedSlowdown < 400f)
+                    {
+                        manipulatedSlowdown = 400f;
+                    }
+
+
+
+
+                    manipulatedSlowdown = slowdownFac;
+                    float pOut = (0f - slipDiff) * manipulatedSlowdown;
+
+                    float wheelAngDamper = (oldWheelHubVel - wheel.AngularVelocity) * slowdownFacDamper;
+
+
+
+                    pOut += wheelAngDamper;
+
+
+                    /*if (float.IsNaN(pOut) || float.IsInfinity(pOut) || float.IsNegativeInfinity(pOut)
+                        || Mathf.Abs(pOut) > 3000f)
+                    {
+                        Debug.LogError("Cor");
+                        wheel.AngularVelocity += lastAcc * Time.fixedDeltaTime;
+                        if (float.IsNaN(pOut) == false && float.IsInfinity(pOut) == false && float.IsNegativeInfinity(pOut) == false)
+                        {
+                            lastAcc = Mathf.Clamp(pOut, -3000f, 3000f);
+                        }
+                    }
+                    else
+                    {*/
+
+
+                    float wheelAcc = (pOut) / wheelMass;
+
+                    oldWheelHubVel = wheel.AngularVelocity;
+                    wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
+                    //if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
+                    //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
+
+                    //if (debugMessages) Debug.Log("No power");
+
+                    lastAcc = wheelAcc;
+                    //}
+
+
+                    //wheel.AngularVelocity += fWheel * slowdownFac;
+
+                    /*W = fWheel * wheelRadius * phi * slowdownFac;
+
+                    float newE = E - W;// * Mathf.Sign(slipLong);
+                    if (newE < 0f)
+                    {
+                        newE = 0f;
+                    }
+
+                    float newAngVel = Mathf.Sqrt((newE * 2f) / J) * Mathf.Sign(wheel.angularVelocity);
+
+                    //thetaDelta = Mathf.Sqrt(2f * (W / J));
+
+                    wheel.AngularVelocity = newAngVel;*/
+                    //}
+                }
+
             }
             else
-            {*/
-
-
-            float wheelAcc = (pOut) / wheelMass;
-
-            oldWheelHubVel = wheel.AngularVelocity;
-            wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
-            if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
-            //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
-
-            //if (debugMessages) Debug.Log("No power");
-
-            lastAcc = wheelAcc;
-                //}
-
-
-                //wheel.AngularVelocity += fWheel * slowdownFac;
-
-                /*W = fWheel * wheelRadius * phi * slowdownFac;
-
-                float newE = E - W;// * Mathf.Sign(slipLong);
-                if (newE < 0f)
-                {
-                    newE = 0f;
-                }
-
-                float newAngVel = Mathf.Sqrt((newE * 2f) / J) * Mathf.Sign(wheel.angularVelocity);
-
-                //thetaDelta = Mathf.Sqrt(2f * (W / J));
-
-                wheel.AngularVelocity = newAngVel;*/
-            //}
+            {
+                //Wheel is in air and no power no braking
+            }
         }
     }
 
