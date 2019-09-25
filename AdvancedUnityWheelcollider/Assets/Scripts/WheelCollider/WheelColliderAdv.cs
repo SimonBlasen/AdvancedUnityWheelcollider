@@ -111,15 +111,15 @@ public class WheelColliderAdv : MonoBehaviour
 
     private void FixedUpdate()
     {
-        cwWheel.FixedUpdate();
         cwWheelTorqueDistr.FixedUpdate();
+        cwWheel.FixedUpdate();
     }
 
     // Update is called once per frame
     void Update()
     {
-        cwWheel.Update();
         cwWheelTorqueDistr.Update();
+        cwWheel.Update();
     }
 
 
