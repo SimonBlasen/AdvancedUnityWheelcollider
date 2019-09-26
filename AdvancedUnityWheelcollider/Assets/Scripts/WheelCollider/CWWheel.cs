@@ -129,7 +129,6 @@ public class CWWheel
     private float fLongitudinalDamper = 0f;//200f;
     private float oldFY = 0f;
     private float oldFX = 0f;
-
     public CWWheel(WheelColliderAdv _wheelColliderAdv, Transform _transform, Rigidbody rigidbody, CWPacejka pacejkaParam,
         Transform wheelMeshParam, float _restLength, float _springTravel, float _springStiffness, float _springDamping, float _wheelRadius, float _wheelMass)
     {
@@ -333,15 +332,18 @@ public class CWWheel
 
                 wheelHubVelocityLongitudinal = wheelVelocity.z;
 
+
                 float cutBorder = 0.1f;
                 float minVal = 0.01f;
                 if (Mathf.Abs(wheelHubVelocityLongitudinal) < cutBorder)
                 {
+                    if (debugMessages) Debug.Log("Cut border");
                     float gB = minVal;
                     float gA = (cutBorder - gB) / cutBorder;
                     wheelHubVelocityLongitudinal = gA * wheelHubVelocityLongitudinal + gB * Mathf.Sign(wheelHubVelocityLongitudinal);
                 }
-                
+
+                torqueDistr.FixedUpdate();
 
                 tireTreadLongitudinalVelocity = angularVelocity * wheelRadius;
                 slipVelocityLongitudinal = tireTreadLongitudinalVelocity - wheelHubVelocityLongitudinal;
@@ -388,6 +390,21 @@ public class CWWheel
 
                 slipAngle = Vector2.Angle(new Vector2(wheelVelocity.x, wheelVelocity.z), new Vector2(0f, 1f)) * Mathf.Sign(wheelVelocity.x);
                 //if (debugMessages) GraphManager.Graph.Plot("Longitude11", slipAngle, Color.green, new Rect(new Vector2(10f, 60f), new Vector2(1000f, 200f)));
+
+
+
+
+
+                float newAngularVelocity = wheelHubVelocityLongitudinal / wheelRadius;
+                float diff = newAngularVelocity - angularVelocity;
+
+                float asdf = 0;
+
+
+
+
+
+
 
 
 
@@ -594,6 +611,8 @@ public class CWWheel
 
     private void calculateNoHit(float clampMax)
     {
+        torqueDistr.FixedUpdate();
+
         wheelIsGrounded = false;
         wentInOnce = false;
         springLength = Mathf.Clamp(springLength, minLength, clampMax);

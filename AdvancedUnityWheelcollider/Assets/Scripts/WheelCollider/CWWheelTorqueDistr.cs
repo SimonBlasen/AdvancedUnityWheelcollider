@@ -35,6 +35,8 @@ public class CWWheelTorqueDistr
     public bool hasMotor = false;
     private float lastAcc = 0f;
 
+    private float minAngMovementNoPower = 0.05f;
+
     private WheelColliderAdv wheelColliderAdv;
 
     public CWWheelTorqueDistr(WheelColliderAdv _wheelColliderAdv, CWWheel _wheel, Rigidbody rigidbody, CWPacejka cWPacejka, bool _hasMotor)
@@ -62,7 +64,7 @@ public class CWWheelTorqueDistr
     private float slowdownFac = 4000f;
     private float slowdownFacDamper = -1000f;
 
-    private float angDiffThreshNoPowerRoll = 0.0f;
+    private float angDiffThreshNoPowerRoll = 30f;
 
     public void FixedUpdate()
     {
@@ -264,7 +266,7 @@ public class CWWheelTorqueDistr
 
                     float slipDiff = wheel.SlipForwardDifference;
 
-                    if (Mathf.Abs(slipDiff) < angDiffThreshNoPowerRoll)
+                    if (false && Mathf.Abs(slipDiff) < angDiffThreshNoPowerRoll)
                     {
                         wheel.AngularVelocity -= slipDiff / wheel.Radius;
                     }
@@ -320,9 +322,46 @@ public class CWWheelTorqueDistr
 
                         float wheelAcc = (pOut) / wheelMass;
 
+                        float perfectAngVel = wheel.LongitudinalHubVelocity / wheelRadius;
+                        float desiredAngVel = wheel.AngularVelocity + wheelAcc * Time.fixedDeltaTime;
+                        if (Mathf.Abs(perfectAngVel - wheel.AngularVelocity) > Mathf.Abs(perfectAngVel - desiredAngVel))
+                        {
+                            Debug.LogError("Turned in wrong direction");
+                            wheel.AngularVelocity = perfectAngVel;
+                        }
+                        else
+                        {
+                            if (Mathf.Abs(desiredAngVel - wheel.AngularVelocity) < minAngMovementNoPower * Time.fixedDeltaTime)
+                            {
+                                float clampedAngVel = wheel.AngularVelocity + minAngMovementNoPower * Time.fixedDeltaTime * Mathf.Sign(wheelAcc);
+                                if (Mathf.Sign((clampedAngVel - perfectAngVel)) != Mathf.Sign(wheel.AngularVelocity - perfectAngVel))
+                                {
+                                    wheel.AngularVelocity = perfectAngVel;
+                                }
+                                else
+                                {
+                                    wheel.AngularVelocity = clampedAngVel;
+                                }
+                            }
+                            else
+                            {
+                                wheel.AngularVelocity = desiredAngVel;
+                            }
+                        }
+
+
+
                         oldWheelHubVel = wheel.AngularVelocity;
                         wheel.AngularVelocity += wheelAcc * Time.fixedDeltaTime;
                         if (debugMessages) GraphManager.Graph.Plot("Longitude2", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 60f + 0f), new Vector2(1000f, 400f)));
+
+
+
+
+
+
+
+
                         //if (debugMessages) GraphManager.Graph.Plot("Longitude", wheel.AngularVelocity, Color.green, new Rect(new Vector2(10f, 130f), new Vector2(1000f, 250f)));
 
                         //if (debugMessages) Debug.Log("No power");
